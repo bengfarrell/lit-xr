@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" class="spectrum--light spectrum--medium">
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <title>XR Components</title>
+    <script src="src/components/scene/scene.js" type="module"></script>
+    <script src="src/components/scene/ui/components/slider.js" type="module"></script>
+    <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+    <style>
+        xr-sliders, sample-component {
+            border: solid 1px red;
+            width: 512px;
+            height: 512px;
+        }
+
+        #xxoffscreen-container {
+            position: absolute;
+            left: 10000px;
+            top: 10000px;
+        }
+
+    </style>
+</head>
+
+<body>
+<babylon-scene></babylon-scene>
+<div id="offscreen-container"></div>
+</body>
+</html>
