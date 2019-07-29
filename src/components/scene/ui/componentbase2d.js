@@ -243,8 +243,8 @@ export default class ComponentBase2D extends HTMLElement {
         return html`<style>
                 :host {
                     display: inline-block;
-                    width: 100%;
-                    height: 100%;
+                    width: ${this.size.width}px;
+                    height: ${this.size.height}px;
                 }
 
                 canvas {
