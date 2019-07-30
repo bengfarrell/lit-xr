@@ -1,7 +1,8 @@
 import {directive, render, svg} from '../../../../../web_modules/lit-html.js';
-import ComponentBase2D from '../componentbase2d.js';
+import ComponentBase2D from '../renderedcomponent2d.js';
+import Utils from '../componentutils.js';
 
-const Map = directive(ComponentBase2D.MapDirective);
+const Map = directive(Utils.MapDirective);
 
 export default class Slider extends ComponentBase2D {
     static get Tag() { return 'xr-slider'; }
@@ -77,4 +78,4 @@ export default class Slider extends ComponentBase2D {
     }
 }
 
-ComponentBase2D.registerComponent( Slider );
+Utils.registerComponent( 'xr-slider', Slider );

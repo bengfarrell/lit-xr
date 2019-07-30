@@ -1,10 +1,9 @@
 import {render, html} from '../../../web_modules/lit-html.js';
-import ComponentBase2D from '../scene/ui/componentbase2d.js';
+import ComponentBase2D from '../scene/ui/renderedcomponent2d.js';
 import Template from './template.js';
+import Utils from '../scene/ui/componentutils.js';
 
 export default class NestedSample extends ComponentBase2D {
-    static get Tag() { return 'nested-sample'; }
-
     onInit() {
         this.data.counter = 0;
     }
@@ -18,4 +17,4 @@ export default class NestedSample extends ComponentBase2D {
     css() { return Template.css(); }
 }
 
-ComponentBase2D.registerComponent( NestedSample );
+Utils.registerComponent( 'nested-sample', NestedSample );

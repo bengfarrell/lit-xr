@@ -5,19 +5,30 @@
     <title>XR Components</title>
     <script src="src/components/scene/scene.js" type="module"></script>
     <script src="src/components/scene/ui/components/slider.js" type="module"></script>
+    <script src="src/components/scene/ui/renderedcomponent2d.js" type="module"></script>
     <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
     <style>
         #offscreen-container {
-            position: absolute;
+            position: initial;
             left: 10000px;
             top: 10000px;
         }
 
+        sample-component {
+            width: 500px;
+            height: 500px;
+            display: inline-block;
+        }
     </style>
 </head>
 
 <body>
 <babylon-scene></babylon-scene>
 <div id="offscreen-container"></div>
+
+
+<!--<rendered-component>
+    <sample-component></sample-component>
+</rendered-component>-->
 </body>
 </html>

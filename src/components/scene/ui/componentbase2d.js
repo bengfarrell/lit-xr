@@ -1,4 +1,5 @@
 import {svg, html, render, directive} from "../../../../web_modules/lit-html.js";
+import Utils from './componentutils.js';
 
 export default class ComponentBase2D extends HTMLElement {
     static get HOVER_CLASS() { return 'hover'; }
@@ -11,159 +12,8 @@ export default class ComponentBase2D extends HTMLElement {
         return true;
     }
 
-    static get MapDirective() {
-        return (dict, key) =>
-            (part) => {
-                part.setValue(key);
-                dict[key] = part.committer.element;
-            };
-    }
-
-    static registerComponent(clazz, options) {
-        if (!clazz.Tag) {
-            throw new Error(`This component definition, ${clazz.name}, does not have a static Tag getter specified to indicate the element's usage in HTML`)
-            return;
-        }
-        let changeCallbackFnName = 'propertyChangedCallback';
-        if (options && options.changeCallbackFnName) {
-            changeCallbackFnName = options.changeCallbackFnName;
-        }
-
-        const decorators = [];
-        const props = clazz.observedAttributes;
-        if (props) {
-            for (let c = 0; c < props.length; c++) {
-                decorators.push({ name: props[c], accessors: {
-                        set: function (val) {
-                            const old = this.getAttribute(props[c]);
-                            if (val === false) {
-                                this.removeAttribute(props[c]);
-                            } else {
-                                this.setAttribute(props[c], val);
-                            }
-                            if (this[changeCallbackFnName]) {
-                                this[changeCallbackFnName](props[c], old, val);
-                            }
-                        },
-
-                        get: function () {
-                            return this.getAttribute(props[c]);
-                        }
-                    }});
-            }
-
-            decorators.push( {
-                name: 'attributeChangedCallback',
-                fn: function(name, oldval, newval) {
-                    if (this[changeCallbackFnName]) {
-                        this[changeCallbackFnName](name, oldval, newval);
-                    }
-                }
-            });
-        }
-
-        const processDecorator = function(d) {
-            if (d.fn) {
-                clazz.prototype[d.name] = d.fn;
-            } else if (d.accessors) {
-                Object.defineProperty(clazz.prototype, d.name, d.accessors);
-            } else {
-                d(clazz, options).forEach( d => processDecorator(d));
-            }
-        };
-
-        decorators.forEach(d => {
-            processDecorator(d);
-        });
-
-        if (!customElements.get(clazz.Tag)) {
-            customElements.define(clazz.Tag, clazz);
-        }
-    }
-
-    constructor() {
-        super();
-        this._hovered = [];
-        this.dom = {};
-        this.interactives = {};
-
-        this.rootdata = {
-            size: {
-                width: 512,
-                height: 512
-            },
-            backgroundColor: '#ffffff',
-            background: () => svg`<rect width="${this.size.width}" height="${this.size.height}" fill="${this.rootdata.backgroundColor}"></rect>`,
-            local:  {},
-            debug: {
-                clickfeedback: { x: 0, y: 0, opacity: .25 }
-            }
-        };
-
-        this.attachShadow({mode: 'open'});
-        this.onInit();
-        this.render();
-    }
-
-    get background() {
-        return this.rootdata.background;
-    }
-
-    set background(fn) {
-        this.rootdata.background = fn;
-    }
-
     // override to populate data before render
     onInit() {}
-
-    get size() {
-        return this.rootdata.size;
-    }
-
-    set size(val) {
-        this.rootdata.size = val;
-    }
-
-    get data() {
-        return this.rootdata.local;
-    }
-
-    set data(val) {
-        this.rootdata.local = val;
-    }
-
-    set bufferCallback(cb) {
-        this._cb = cb;
-    }
-
-    set capturePointerEvents(on) {
-        if (on) {
-            this.interactives.__element = this;
-        } else {
-            if (this.interactives.__element) {
-                delete this.interactives.__element;
-            }
-        }
-    }
-
-    renderBuffer() {
-        const xml = new XMLSerializer().serializeToString(this.dom.svg).replace(/#/g, '%23');
-        const img = new Image();
-        this.dom.buffer.width = this.size.width;
-        this.dom.buffer.height = this.size.height;
-        img.onload = () => {
-            if (!this._ctx) {
-                this._ctx = this.dom.buffer.getContext('2d');
-                this._ctx.width = this.size.width;
-                this._ctx.height = this.size.height;
-            }
-            this._ctx.drawImage(img, 0, 0, this.size.width, this.size.height, 0, 0, this.size.width, this.size.height);
-            if (this._cb) {
-                this._cb(this.dom.buffer);
-            }
-        };
-        img.src = "data:image/svg+xml," + xml;
-    }
 
     handlePointerEvent(eventtype, x, y, debug) {
         let change = false;
@@ -219,6 +69,10 @@ export default class ComponentBase2D extends HTMLElement {
                     change = true;
                 }
             }
+
+            if (el.handlePointerEvent) {
+                el.handlePointerEvent(eventtype, x, y, debug)
+            }
         });
 
         if (eventtype === 'mousemove') {
@@ -236,36 +90,7 @@ export default class ComponentBase2D extends HTMLElement {
 
     render() {
         render(html`${this.template()}`, this.shadowRoot);
-        this.renderBuffer();
     }
-
-    template() {
-        return html`<style>
-                :host {
-                    display: inline-block;
-                    width: ${this.size.width}px;
-                    height: ${this.size.height}px;
-                }
-
-                canvas {
-                    display: none;
-                }
-
-                :host([showcanvas]) canvas {
-                    display: inline-block;
-                }
-            </style>
-            <canvas map=${Map(this.dom, 'buffer')}></canvas>
-            <svg map=${Map(this.dom, 'svg')} viewBox="0 0 ${this.size.width} ${this.size.height}">
-                ${this.css()}
-                ${this.background()}
-                ${this.html()}
-                <circle cx="${this.rootdata.debug.clickfeedback.x}" cy="${this.rootdata.debug.clickfeedback.y}" r="5" fill="red" opacity="${this.rootdata.debug.clickfeedback.opacity}"></circle>
-            </svg>`;
-    }
-
-    html() { return svg``; }
-    css() { return svg``; }
 }
 
-const Map = directive(ComponentBase2D.MapDirective);
+const Map = directive(Utils.MapDirective);

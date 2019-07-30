@@ -1,9 +1,15 @@
 import Babylon from '../../../../web_modules/babylonjs.js';
 
 export default class BabylonUIComponent {
-    constructor(name, def, meshscale, scene, offscreenContainer) {
-        this.element = document.createElement(def.Tag);
-        offscreenContainer.appendChild(this.element);
+    constructor(name, component, meshscale, scene, offscreenContainer) {
+        //this.element = document.createElement('rendered-component');
+        //offscreenContainer.appendChild(this.element);
+
+        const template = document.createElement('template');
+        template.innerHTML = `<rendered-component><sample-component></sample-component></rendered-component>`;
+        offscreenContainer.appendChild(template.content);
+        this.element = offscreenContainer.children[0];
+
         this.size = {
             width: this.element.size.width * meshscale,
             height: this.element.size.height * meshscale
