@@ -34,12 +34,12 @@ export default class Slider extends RenderableComponent {
 
             case 'mousemove':
                 if (this.data.thumbClicked) {
-                    this.data.thumbX = e.clientX - this.data.thumbWidth/2;
+                    this.data.thumbX = e.clientX - this.data.thumbWidth/2 - this.offsetLeft;
                 }
                 break;
 
             case 'click':
-                this.data.thumbX = e.clientX - this.data.thumbWidth/2;
+                this.data.thumbX = e.clientX - this.data.thumbWidth/2 - this.offsetLeft;
                 break;
         }
         this.render();
@@ -47,39 +47,38 @@ export default class Slider extends RenderableComponent {
 
     css() {
         return svg`<style>
-                #track {
+                xr-slider .track {
                     width: calc(100% - 20px);
                     height: calc(100% - 20px);
-                    x: 10px;
-                    y: 10px;
-                    rx: 5px;
-                    fill: #0000ff;
+                    margin: 10px;
+                    border-radius: 5px;
+                    background-color: black;
                 }
                 
-                #thumb {
-                    rx: 5px; 
-                    stroke: black; 
-                    fill: white;
+                xr-slider .thumb {
+                    border-color: black;
+                    border-style: solid;
+                    border-width: 1px;
+                    border-radius: 5px;
                     height: calc(100% - 10px);
-                    y: 5px;
+                    background-color: white;
+                    position: absolute;
+                    top: 5px;
                 }
                 
                 xr-slider {
                     display: inline-block;
-                    width: 100%;
-                    height: 100%;
+                    position: relative;
                 }
             </style>`;
     }
 
-    html() { return svg`<svg width="${this.preferredSize.width}" height="${this.preferredSize.height}">
-                        ${this.css()}
-                        <rect id="track"></rect>
-                        <rect id="thumb" @mousedown=${e => this.onPointerEvent(e)}
+    html() { return html`${this.css()}
+                        <div class="track"></div>
+                        <div class="thumb" @mousedown=${e => this.onPointerEvent(e)}
                               @click=${e => this.onPointerEvent(e)}  
-                              x="${this.data.thumbX}" 
-                              width="${this.data.thumbWidth}">            
-                        </rect></svg>`;
+                              style="left: ${this.data.thumbX}px; width: ${this.data.thumbWidth}px;">            
+                        </div>`;
     }
 }
 

@@ -8,7 +8,7 @@ import Slider from './ui/components/slider.js';
 export default class App extends BaseApplication {
     constructor(el, cfg) {
         super(el, cfg);
-        this.component = new BabylonUIComponent('test', 'nested-sample', .01, this.scene, document.getElementById('offscreen-container') );
+        this.component = new BabylonUIComponent('test', 'sample-component', .01, this.scene, document.getElementById('offscreen-container') );
         //this.scene.debugLayer.show();
 
     }

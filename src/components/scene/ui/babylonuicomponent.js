@@ -4,10 +4,11 @@ import ComponentBase2D from './componentbase2d.js';
 export default class BabylonUIComponent {
     constructor(name, component, meshscale, scene, offscreenContainer) {
         const comp = document.createElement(component);
+        comp.setAttribute('is-render-root', true);
         const renderingEl = document.createElement('component-base-2d');
         renderingEl.appendChild(comp);
         offscreenContainer.appendChild(renderingEl);
-        this.element = offscreenContainer.children[0];
+        this.element = renderingEl;
 
         this.size = {
             width: comp.preferredSize.width,

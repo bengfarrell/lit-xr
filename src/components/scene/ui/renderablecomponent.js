@@ -3,8 +3,17 @@ import {svg, html} from "./pointerevents.js";
 import ComponentBase2D from "./componentbase2d.js";
 
 export default class RenderableComponent extends HTMLElement {
-    static get preferredSize() { return { width: 500, height: 500 }; }
-    get preferredSize() { return this.constructor.preferredSize; }
+    static get preferredSize() {
+        return {width: 500, height: 500};
+    }
+
+    get backgroundColor() {
+        return '#ffffff';
+    }
+
+    get preferredSize() {
+        return this.constructor.preferredSize;
+    }
 
     get renderRoot() {
         if (!this._cachedRoot) {
@@ -18,10 +27,11 @@ export default class RenderableComponent extends HTMLElement {
         this.render();
     }
 
-    onInit() {}
+    onInit() {
+    }
 
     render() {
-        render(html`${this.html()}`, this);
+        render(html`${this.svgwrapper()}`, this);
         this.renderRoot.render();
     }
 
@@ -29,5 +39,21 @@ export default class RenderableComponent extends HTMLElement {
         return this.querySelector('svg');
     }
 
-    html() { return svg``; }
+    html() {
+        return html``;
+    }
+
+    svgwrapper() {
+        const width = this.preferredSize.width;
+        const height = this.preferredSize.height;
+        if (this.hasAttribute('is-render-root')) {
+            return svg`<svg viewBox="0 0 ${width} ${height}">
+                        <foreignObject class="host" width="100%" height="100%" style="background: ${this.backgroundColor};">
+                            ${this.html()}
+                        </foreignObject>
+                   </svg>`;
+        } else {
+            return this.html();
+        }
+    }
 }
