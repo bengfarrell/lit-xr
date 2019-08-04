@@ -1,26 +1,28 @@
 import Babylon from '../../../../web_modules/babylonjs.js';
+import ComponentBase2D from './componentbase2d.js';
 
 export default class BabylonUIComponent {
     constructor(name, component, meshscale, scene, offscreenContainer) {
-        //this.element = document.createElement('rendered-component');
-        //offscreenContainer.appendChild(this.element);
-
-        const template = document.createElement('template');
-        template.innerHTML = `<rendered-component><sample-component></sample-component></rendered-component>`;
-        offscreenContainer.appendChild(template.content);
+        const comp = document.createElement(component);
+        const renderingEl = document.createElement('component-base-2d');
+        renderingEl.appendChild(comp);
+        offscreenContainer.appendChild(renderingEl);
         this.element = offscreenContainer.children[0];
 
         this.size = {
-            width: this.element.size.width * meshscale,
-            height: this.element.size.height * meshscale
+            width: comp.preferredSize.width,
+            height: comp.preferredSize.height,
+            scale: meshscale
         };
 
+        renderingEl.size = this.size;
+
         this.mesh = BABYLON.MeshBuilder.CreatePlane(name, {
-            width: this.size.width,
-            height: this.size.height
+            width: this.size.width  * meshscale,
+            height: this.size.height  * meshscale
         }, scene);
 
-        this.texture = new BABYLON.DynamicTexture("dynamic texture", {width: this.element.size.width * 2, height: this.element.size.height * 2}, scene);
+        this.texture = new BABYLON.DynamicTexture("dynamic texture", {width: this.size.width, height: this.size.height}, scene);
         this.textureContext = this.texture.getContext();
         this.material = new BABYLON.StandardMaterial("Mat", scene);
         this.material.diffuseTexture = this.texture;
@@ -29,19 +31,21 @@ export default class BabylonUIComponent {
         this.mesh.material = this.material;
 
         this.element.bufferCallback = data => this.onBufferCallback(data);
-        this.element.renderBuffer();
+        this.element.renderBuffer(this.size.width, this.size.height);
 
     }
 
     handlePointerEvent(eventtype, point, debug) {
         // normalize to 0-1 range
-        const x = (point.x + this.size.width/2) / this.size.width;
-        const y = 1 - (point.y + this.size.height/2) / this.size.height;
+        const width = this.size.width * this.size.scale;
+        const height = this.size.height * this.size.scale;
+        const x = (point.x + width/2) / width;
+        const y = 1 - (point.y + height/2) / height;
         this.element.handlePointerEvent(eventtype, x, y, debug);
     }
 
     onBufferCallback(data) {
-        this.textureContext.drawImage(data, 0, 0, this.element.size.width * 2, this.element.size.height * 2);
+        this.textureContext.drawImage(data, 0, 0, this.size.width, this.size.height);
         this.texture.update();
     }
 }

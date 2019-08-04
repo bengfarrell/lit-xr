@@ -1,34 +1,23 @@
-import {render, html, directive} from '../../../web_modules/lit-html.js';
-import ComponentBase2D from '../scene/ui/renderedcomponent2d.js';
+import {render} from '../../../web_modules/lit-html.js';
+import {html, interactables} from '../scene/ui/pointerevents.js';
 import Template from './template.js';
 import Utils from '../scene/ui/componentutils.js';
+import ComponentBase2D from "../scene/ui/componentbase2d.js";
+import RenderableComponent from "../scene/ui/renderablecomponent.js";
 
-const Map = directive(Utils.MapDirective);
-
-export default class SampleComponent extends HTMLElement {
-    connectedCallback() {
-        this.onInit();
-        this.render();
-    }
+export default class SampleComponent extends RenderableComponent {
 
     onInit() {
-        this.interactives = {};
         this.dom = {};
         this.data = { counter: 0 }
-    }
-
-    render() {
-        render(html`${Template.html(this, this.data)}`, this);
-    }
-
-    asSVG() {
-        return this.querySelector('svg');
     }
 
     onClick(e) {
         this.data.counter ++;
         this.render();
     }
+
+    html() { return Template.html(this, this.data); }
 }
 
 Utils.registerComponent( 'sample-component', SampleComponent );

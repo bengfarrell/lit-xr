@@ -1,13 +1,15 @@
-import {svg, directive} from '../../../web_modules/lit-html.js';
+import {svg} from '../scene/ui/pointerevents.js';
+import {directive} from "../../../web_modules/lit-html.js";
 import Utils from '../scene/ui/componentutils.js';
+import Slider from '../scene/ui/components/slider.js';
 
 const Map = directive(Utils.MapDirective);
 
 export default {
     html(scope, data) {
-        const width = 500;
-        const height = 500;
-        return svg`<svg map=${Map(scope.dom, 'svg')} viewBox="0 0 ${width} ${height}">
+        const width = scope.preferredSize.width;
+        const height = scope.preferredSize.height;
+        return svg`<svg viewBox="0 0 ${width} ${height}">
                     ${this.css()}
                     <rect x="0" y="0" width="100%" height="100%" fill="green"></rect>
                     <rect x="0" y="0" width="5" height="5" fill="blue"></rect>
@@ -23,7 +25,7 @@ export default {
                         <div>
                             Counter ${data.counter}
                         </div>
-                        <button map=${Map(scope.interactives, 'button')} @click=${e => scope.onClick(e)}>Click me</button>
+                        <button @click=${e => scope.onClick(e)}>Click me</button>
                     </foreignObject>
                 </svg>`;
     },
