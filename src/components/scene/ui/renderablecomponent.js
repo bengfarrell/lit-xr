@@ -35,6 +35,12 @@ export default class RenderableComponent extends HTMLElement {
         this.renderRoot.render();
     }
 
+    sendMessage(name, o) {
+        this.onMessage(name, o);
+    }
+
+    onMessage(name, o) {}
+
     asSVG() {
         return this.querySelector('svg');
     }

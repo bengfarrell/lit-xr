@@ -9,11 +9,16 @@ export default class SampleComponent extends RenderableComponent {
 
     onInit() {
         this.dom = {};
-        this.data = { counter: 0 }
+        this.data = { counter: 0 };
     }
 
     onClick(e) {
         this.data.counter ++;
+        this.render();
+    }
+
+    onMessage(name, o) {
+        this.data.message = o.x + ',' + o.y;
         this.render();
     }
 

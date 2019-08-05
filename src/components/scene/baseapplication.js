@@ -1,17 +1,18 @@
 import BaseConfig from './baseconfig.js';
 import BaseGroup from './basegroup.js';
 import EventListener from './eventlistener.js';
-import Babylon from '../../../web_modules/babylonjs.js';
+//import BABYLON from '../../../web_modules/BABYLONjs.js';
 
 export default class BaseApplication extends EventListener {
     constructor(el, cfg) {
         super();
         this.appConfig = BaseConfig.apply(cfg);
         this.element = el;
-        this.engine = new Babylon.Engine(this.element, this.appConfig.engine.antialias, this.appConfig.engine.options);
+
+        this.engine = new BABYLON.Engine(this.element, this.appConfig.engine.antialias, this.appConfig.engine.options);
         this.engine.enableOfflineSupport = false;
-        this.scene = new Babylon.Scene(this.engine);
-        this.scene.useRightHandedSystem = this.appConfig.scene.useRightHandedSystem;
+        this.scene = new BABYLON.Scene(this.engine);
+        //this.scene.useRightHandedSystem = this.appConfig.scene.useRightHandedSystem;
 
         this.isApplication = true;
         this.engine.runRenderLoop( () => this.tick() );
@@ -33,6 +34,29 @@ export default class BaseApplication extends EventListener {
         this.root.onParented(this.scene, this, this.element);
 
         this.elementSize = { width: this.element.offsetWidth, height: this.element.offsetHeight };
+
+        // Default Environment
+        this.environment = this.scene.createDefaultEnvironment({ enableGroundShadow: true, groundYBias: 1 });
+        this.environment.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
+
+        this.xrHelper = this.scene.createDefaultVRExperience({createDeviceOrientationCamera:false});
+        this.xrHelper.enableTeleportation({floorMeshes: [this.environment.ground]});
+        this.xrHelper.enableInteractions();
+
+        this.scene.onPointerObservable.add((pointerInfo) => {
+            switch (pointerInfo.type) {
+                case BABYLON.PointerEventTypes.POINTERDOWN:
+                    this.mouseEvent('mousedown', this.scene.pointerX, this.scene.pointerY);
+                    break;
+                case BABYLON.PointerEventTypes.POINTERUP:
+                    this.mouseEvent('mouseup', this.scene.pointerX, this.scene.pointerY);
+                    break;
+                case BABYLON.PointerEventTypes.POINTERMOVE:
+                    this.sendMessage('coords', {x: pointerInfo.event.clientX, y: pointerInfo.event.clientY });
+                    this.mouseEvent('mousemove', pointerInfo.event.clientX, pointerInfo.event.clientY );
+                    break;
+            }
+        });
 
         window.addEventListener('resize', () => this.onResize());
     }
@@ -99,7 +123,7 @@ export default class BaseApplication extends EventListener {
             this.initialized = true;
         }
 
-        if (this.initialized && this.cameras.length > 0) {
+        if (this.initialized /*&& this.cameras.length > 0*/) {
             if (this.elementSize.width !== this.element.offsetWidth || this.elementSize.height !== this.element.offsetHeight) {
                 this.onResize();
             }
@@ -145,9 +169,12 @@ export default class BaseApplication extends EventListener {
         }
     }
 
+    sendMessage(name, o) {}
+
     onResize() { this.engine.resize(); }
 
     onCreate(sceneEl) {}
     onRender(time) {}
     onMouseEvent(eventtype, mesh, point) {}
+    onMessage(name, o) {}
 }

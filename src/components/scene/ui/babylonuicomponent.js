@@ -36,6 +36,10 @@ export default class BabylonUIComponent {
 
     }
 
+    sendMessage(name, o) {
+        this.element.sendMessage(name, o);
+    }
+
     handlePointerEvent(eventtype, point, debug) {
         // normalize to 0-1 range
         const width = this.size.width * this.size.scale;

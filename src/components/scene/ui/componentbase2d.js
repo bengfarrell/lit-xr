@@ -54,6 +54,10 @@ export default class ComponentBase2D extends HTMLElement {
         this._cb = cb;
     }
 
+    sendMessage(name, o) {
+        this.dom.svg.assignedNodes()[0].sendMessage(name, o);
+    }
+
     handlePointerEvent(eventtype, x, y, debug) {
         let change = false;
         const bounds = this.getBoundingClientRect();

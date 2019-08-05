@@ -11,7 +11,7 @@ export default {
         const height = scope.preferredSize.height;
         return html`${this.css()}
                     <div class="container">
-                        Counter ${data.counter}
+                        Counter ${data.counter} ${data.message}
                     </div>
                     <xr-slider></xr-slider>
                     <button @click=${e => scope.onClick(e)}>Click me</button>`;

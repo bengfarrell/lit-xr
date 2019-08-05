@@ -12,7 +12,7 @@ export default class Scene extends HTMLElement {
             lights: 'default'
         });
 
-        this.addEventListener('pointermove', e => {
+        /*this.addEventListener('pointermove', e => {
             this._3dScene.mouseEvent('mousemove', e.offsetX, e.offsetY);
         });
 
@@ -22,7 +22,7 @@ export default class Scene extends HTMLElement {
 
         this.addEventListener('pointerup', e => {
             this._3dScene.mouseEvent('mouseup', e.offsetX, e.offsetY);
-        });
+        });*/
     }
 }
 
