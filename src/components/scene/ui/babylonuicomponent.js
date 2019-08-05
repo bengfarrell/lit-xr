@@ -1,4 +1,4 @@
-import Babylon from '../../../../web_modules/babylonjs.js';
+//import Babylon from '../../../../web_modules/babylonjs.js';
 import ComponentBase2D from './componentbase2d.js';
 
 export default class BabylonUIComponent {

@@ -11,11 +11,26 @@ export default class BaseApplication extends EventListener {
 
         this.engine = new BABYLON.Engine(this.element, this.appConfig.engine.antialias, this.appConfig.engine.options);
         this.engine.enableOfflineSupport = false;
-        this.scene = new BABYLON.Scene(this.engine);
+        this.initScene().then( (s) => {
+            this.scene = s;
+            this.engine.runRenderLoop(() => {
+            this.tick();
+        });
+
+        });
+
+        // Resize
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+    }
+
+    async initScene() {
+        const scene = new BABYLON.Scene(this.engine);
         //this.scene.useRightHandedSystem = this.appConfig.scene.useRightHandedSystem;
 
         this.isApplication = true;
-        this.engine.runRenderLoop( () => this.tick() );
+        //this.engine.runRenderLoop( () => this.tick() );
 
         this.cameras = [];
         this.lights = [];
@@ -30,20 +45,29 @@ export default class BaseApplication extends EventListener {
 
         this.root = new BaseGroup();
         this.root.parent = this;
-        this.root.initializeGroup(this.scene, 'application-root');
-        this.root.onParented(this.scene, this, this.element);
+        this.root.initializeGroup(scene, 'application-root');
+        this.root.onParented(scene, this, this.element);
 
         this.elementSize = { width: this.element.offsetWidth, height: this.element.offsetHeight };
 
         // Default Environment
-        this.environment = this.scene.createDefaultEnvironment({ enableGroundShadow: true, groundYBias: 1 });
-        this.environment.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
+       const environment = scene.createDefaultEnvironment({ enableGroundShadow: true, groundYBias: 1 });
+       environment.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
 
-        this.xrHelper = this.scene.createDefaultVRExperience({createDeviceOrientationCamera:false});
-        this.xrHelper.enableTeleportation({floorMeshes: [this.environment.ground]});
-        this.xrHelper.enableInteractions();
+        // Check XR support
+        const xrHelper = await scene.createDefaultXRExperienceAsync({floorMeshes: [environment.ground]});
+        xrHelper.baseExperience.onStateChangedObservable.add((state)=>{
+            if(state === BABYLON.WebXRState.IN_XR){
+                // When entering webXR, position the user's feet at 0,0,-1
+                xrHelper.baseExperience.setPositionOfCameraUsingContainer(new BABYLON.Vector3(0,xrHelper.baseExperience.camera.position.y,-1))
+            }        
+        });
 
-        this.scene.onPointerObservable.add((pointerInfo) => {
+        xrHelper.input.onControllerAddedObservable.add((controller)=>{
+            this.controller = controller;
+        });
+
+        /*scene.onPointerObservable.add((pointerInfo) => {
             switch (pointerInfo.type) {
                 case BABYLON.PointerEventTypes.POINTERDOWN:
                     this.mouseEvent('mousedown', this.scene.pointerX, this.scene.pointerY);
@@ -52,13 +76,14 @@ export default class BaseApplication extends EventListener {
                     this.mouseEvent('mouseup', this.scene.pointerX, this.scene.pointerY);
                     break;
                 case BABYLON.PointerEventTypes.POINTERMOVE:
-                    this.sendMessage('coords', {x: pointerInfo.event.clientX, y: pointerInfo.event.clientY });
-                    this.mouseEvent('mousemove', pointerInfo.event.clientX, pointerInfo.event.clientY );
+                console.log('pointer move')
+                    this.mouseEvent('mousemove', this.scene.pointerX, this.scene.pointerY );
                     break;
             }
-        });
+        });*/
 
         window.addEventListener('resize', () => this.onResize());
+        return scene;
     }
 
     get canvas() { return this.element; }
@@ -126,6 +151,27 @@ export default class BaseApplication extends EventListener {
         if (this.initialized /*&& this.cameras.length > 0*/) {
             if (this.elementSize.width !== this.element.offsetWidth || this.elementSize.height !== this.element.offsetHeight) {
                 this.onResize();
+            }
+
+            if (this.controller) {
+                const ray = new BABYLON.Ray(this.controller.pointer.absolutePosition, this.controller.pointer.forward, 1000);
+                const pick = this.scene.pickWithRay(ray);
+                if (pick.hit) {
+                    this.onMouseEvent('mousemove', pick.pickedMesh, pick.pickedPoint);
+
+                    if(this.controller.inputSource.gamepad.buttons[0].pressed){
+                        console.log('triggerDown')
+                        if (!this.triggerDown){
+                            this.onMouseEvent('mousedown', pick.pickedMesh, pick.pickedPoint);
+                        }
+                    } else {
+                        if (this.triggerDown) {
+                            this.onMouseEvent('mouseup', pick.pickedMesh, pick.pickedPoint);
+                        }
+                        this.triggerDown = false;
+                    }
+                }
+
             }
             this.scene.render();
             this.onRender(this.engine.getDeltaTime());
