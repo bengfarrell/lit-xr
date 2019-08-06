@@ -22,17 +22,28 @@ export default class RenderableComponent extends HTMLElement {
         return this._cachedRoot;
     }
 
+    set renderWrapper(val) {
+        this._renderWrapper = val;
+        this.render();
+    }
+
+    get renderWrapper() {
+        return this._renderWrapper;
+    }
+
     connectedCallback() {
         this.onInit();
         this.render();
     }
 
-    onInit() {
-    }
+    onInit() {}
 
     render() {
         render(html`${this.svgwrapper()}`, this);
-        this.renderRoot.render();
+
+        if (this.renderRoot.renderWrapper) {
+            this.renderRoot.renderWrapper.render();
+        }
     }
 
     sendMessage(name, o) {

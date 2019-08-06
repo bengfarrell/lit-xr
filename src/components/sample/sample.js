@@ -17,11 +17,6 @@ export default class SampleComponent extends RenderableComponent {
         this.render();
     }
 
-    onMessage(name, o) {
-        this.data.message = o.x + ',' + o.y;
-        this.render();
-    }
-
     html() { return Template.html(this, this.data); }
 }
 

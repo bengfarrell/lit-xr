@@ -72,10 +72,10 @@ export class Interactables {
 
             // can't depend on renderRoot existing due to timing issues when the component is first starting up
             const rootEl = el.renderRoot !== undefined ? el.renderRoot : ComponentBase2D.findRenderRoot(el);
-            if (this._sorted.has(rootEl)) {
-                this._sorted.get(rootEl).push(el);
+            if (this._sorted.has(rootEl.renderWrapper)) {
+                this._sorted.get(rootEl.renderWrapper).push(el);
             } else {
-                this._sorted.set( rootEl, [el]);
+                this._sorted.set( rootEl.renderWrapper, [el]);
             }
         }
         this._unsorted = [];

@@ -1,7 +1,7 @@
 import BaseConfig from './baseconfig.js';
 import BaseGroup from './basegroup.js';
 import EventListener from './eventlistener.js';
-//import BABYLON from '../../../web_modules/BABYLONjs.js';
+import Babylon from '../../../web_modules/babylonjs.js';
 
 export default class BaseApplication extends EventListener {
     constructor(el, cfg) {
@@ -9,7 +9,7 @@ export default class BaseApplication extends EventListener {
         this.appConfig = BaseConfig.apply(cfg);
         this.element = el;
 
-        this.engine = new BABYLON.Engine(this.element, this.appConfig.engine.antialias, this.appConfig.engine.options);
+        this.engine = new Babylon.Engine(this.element, this.appConfig.engine.antialias, this.appConfig.engine.options);
         this.engine.enableOfflineSupport = false;
         this.initScene().then( (s) => {
             this.scene = s;
@@ -26,12 +26,10 @@ export default class BaseApplication extends EventListener {
     }
 
     async initScene() {
-        const scene = new BABYLON.Scene(this.engine);
+        const scene = new Babylon.Scene(this.engine);
         //this.scene.useRightHandedSystem = this.appConfig.scene.useRightHandedSystem;
 
         this.isApplication = true;
-        //this.engine.runRenderLoop( () => this.tick() );
-
         this.cameras = [];
         this.lights = [];
 
@@ -52,35 +50,36 @@ export default class BaseApplication extends EventListener {
 
         // Default Environment
        const environment = scene.createDefaultEnvironment({ enableGroundShadow: true, groundYBias: 1 });
-       environment.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
+       environment.setMainColor(Babylon.Color3.FromHexString("#74b9ff"));
 
         // Check XR support
         const xrHelper = await scene.createDefaultXRExperienceAsync({floorMeshes: [environment.ground]});
         xrHelper.baseExperience.onStateChangedObservable.add((state)=>{
-            if(state === BABYLON.WebXRState.IN_XR){
+            if(state === Babylon.WebXRState.IN_XR){
                 // When entering webXR, position the user's feet at 0,0,-1
-                xrHelper.baseExperience.setPositionOfCameraUsingContainer(new BABYLON.Vector3(0,xrHelper.baseExperience.camera.position.y,-1))
-            }        
+                xrHelper.baseExperience.setPositionOfCameraUsingContainer(new Babylon.Vector3(0,xrHelper.baseExperience.camera.position.y,-1))
+            }
         });
 
         xrHelper.input.onControllerAddedObservable.add((controller)=>{
             this.controller = controller;
         });
 
-        /*scene.onPointerObservable.add((pointerInfo) => {
-            switch (pointerInfo.type) {
-                case BABYLON.PointerEventTypes.POINTERDOWN:
-                    this.mouseEvent('mousedown', this.scene.pointerX, this.scene.pointerY);
-                    break;
-                case BABYLON.PointerEventTypes.POINTERUP:
-                    this.mouseEvent('mouseup', this.scene.pointerX, this.scene.pointerY);
-                    break;
-                case BABYLON.PointerEventTypes.POINTERMOVE:
-                console.log('pointer move')
-                    this.mouseEvent('mousemove', this.scene.pointerX, this.scene.pointerY );
-                    break;
+        scene.onPointerObservable.add((pointerInfo) => {
+            if (!this.controller) {
+                switch (pointerInfo.type) {
+                    case Babylon.PointerEventTypes.POINTERDOWN:
+                        this.mouseEvent('mousedown', this.scene.pointerX, this.scene.pointerY);
+                        break;
+                    case Babylon.PointerEventTypes.POINTERUP:
+                        this.mouseEvent('mouseup', this.scene.pointerX, this.scene.pointerY);
+                        break;
+                    case Babylon.PointerEventTypes.POINTERMOVE:
+                        this.mouseEvent('mousemove', this.scene.pointerX, this.scene.pointerY );
+                        break;
+                }
             }
-        });*/
+        });
 
         window.addEventListener('resize', () => this.onResize());
         return scene;
@@ -98,20 +97,20 @@ export default class BaseApplication extends EventListener {
         }
 
         if (!options.position) {
-            options.position = new BABYLON.Vector3(0, 0, 0);
+            options.position = new Babylon.Vector3(0, 0, 0);
         } else {
-            options.position = new BABYLON.Vector3(options.position.x, options.position.y, options.position.z);
+            options.position = new Babylon.Vector3(options.position.x, options.position.y, options.position.z);
         }
 
         let camera;
         switch (type) {
             case 'default':
             case 'freecamera':
-                camera = new BABYLON.FreeCamera('camera', options.position, this.scene);
+                camera = new Babylon.FreeCamera('camera', options.position, this.scene);
                 break;
 
             case 'arcrotate':
-                camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 0, 0, 0, BABYLON.Vector3.Zero(), this.scene);
+                camera = new Babylon.ArcRotateCamera("ArcRotateCamera", 0, 0, 0, Babylon.Vector3.Zero(), this.scene);
                 camera.wheelPrecision = 1000;
                 camera.setPosition(options.position);
                 camera.attachControl(this.element, true);
@@ -131,7 +130,7 @@ export default class BaseApplication extends EventListener {
      * convenience method to add a typical light
      */
     addLights() {
-        let light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, -1), this.scene);
+        let light = new Babylon.HemisphericLight("light1", new Babylon.Vector3(0, 1, -1), this.scene);
         light.intensity = 0.7;
     }
 
@@ -154,13 +153,12 @@ export default class BaseApplication extends EventListener {
             }
 
             if (this.controller) {
-                const ray = new BABYLON.Ray(this.controller.pointer.absolutePosition, this.controller.pointer.forward, 1000);
+                const ray = new Babylon.Ray(this.controller.pointer.absolutePosition, this.controller.pointer.forward, 1000);
                 const pick = this.scene.pickWithRay(ray);
                 if (pick.hit) {
                     this.onMouseEvent('mousemove', pick.pickedMesh, pick.pickedPoint);
 
                     if(this.controller.inputSource.gamepad.buttons[0].pressed){
-                        console.log('triggerDown')
                         if (!this.triggerDown){
                             this.onMouseEvent('mousedown', pick.pickedMesh, pick.pickedPoint);
                         }

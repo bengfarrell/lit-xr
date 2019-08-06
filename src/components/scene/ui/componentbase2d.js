@@ -4,6 +4,8 @@ import SampleComponent from "../../sample/sample.js";
 import Utils from './componentutils.js';
 
 export default class ComponentBase2D extends HTMLElement {
+    static get observedAttributes() { return ['root-component'] }
+
     static get HOVER_CLASS() { return 'hover'; }
 
     static isPointInsideBounds(pt, bounds) {
@@ -15,9 +17,9 @@ export default class ComponentBase2D extends HTMLElement {
     }
 
     static findRenderRoot(el) {
-        let parent = el.parentElement;
+        let parent = el;
         while (parent) {
-            if (parent.constructor === ComponentBase2D) {
+            if (parent.hasAttribute('is-render-root')) {
                 return parent;
             } else {
                 parent = parent.parentElement;
@@ -26,28 +28,33 @@ export default class ComponentBase2D extends HTMLElement {
         return null;
     }
 
+    attributeChangedCallback(name, oldval, newval) {
+        render(this.template(), this.shadowRoot);
+        this.dom.buffer = this.shadowRoot.querySelector('canvas');
+        this.dom.svg = document.createElement(this.getAttribute('root-component'));
+        this.size = this.dom.svg.preferredSize;
+        this.dom.svg.style.width = this.dom.svg.preferredSize.width + 'px';
+        this.dom.svg.style.height = this.dom.svg.preferredSize.height + 'px';
+        this.style.width = this.dom.svg.preferredSize.width + 'px';
+        this.style.height = this.dom.svg.preferredSize.height + 'px';
+        this.dom.svg.style.display = 'inline-block';
+        this.dom.svg.setAttribute('is-render-root', true);
+        this.shadowRoot.appendChild(this.dom.svg);
+        this.dom.svg.renderWrapper = this;
+
+        this.render();
+    }
+
     constructor() {
         super();
         this._hovered = [];
         this.dom = {};
-        this.data = {
-            size: {
-                width: 100,
-                height: 100
-            }
+        this.size = {
+            width: 100,
+            height: 100
         };
 
         this.attachShadow({mode: 'open'});
-        this.render();
-    }
-
-    get size() {
-        return this.data.size;
-    }
-
-    set size(val) {
-        this.data.size = val;
-        this.render();
     }
 
     set bufferCallback(cb) {
@@ -55,7 +62,7 @@ export default class ComponentBase2D extends HTMLElement {
     }
 
     sendMessage(name, o) {
-        this.dom.svg.assignedNodes()[0].sendMessage(name, o);
+        this.dom.svg.sendMessage(name, o);
     }
 
     handlePointerEvent(eventtype, x, y, debug) {
@@ -123,10 +130,8 @@ export default class ComponentBase2D extends HTMLElement {
     }
 
     renderBuffer() {
-        if (this.dom.svg.assignedNodes().length === 0) { return; }
-        if (!this.dom.svg.assignedNodes()[0].asSVG) { return; }
-
-        const xml = new XMLSerializer().serializeToString(this.dom.svg.assignedNodes()[0].asSVG()).replace(/#/g, '%23');
+        if (!this.dom.svg.asSVG()) { return; }
+        const xml = new XMLSerializer().serializeToString(this.dom.svg.asSVG()).replace(/#/g, '%23');
         const img = new Image();
         this.dom.buffer.width = this.size.width;
         this.dom.buffer.height = this.size.height;
@@ -145,7 +150,6 @@ export default class ComponentBase2D extends HTMLElement {
     }
 
     render() {
-        render(this.template(), this.shadowRoot);
         interactables.sort();
         this.renderBuffer();
     }
@@ -154,8 +158,6 @@ export default class ComponentBase2D extends HTMLElement {
         return html`<style>
                 :host {
                     display: inline-block;
-                    width: ${this.size.width}px;
-                    height: ${this.size.height}px;
                 }
 
                 canvas {
@@ -167,12 +169,10 @@ export default class ComponentBase2D extends HTMLElement {
                 }
             </style>
 
-            <canvas map=${Map(this.dom, 'buffer')}></canvas>
-            <slot map=${Map(this.dom, 'svg')}>
-                <svg viewBox="0 0 ${this.size.width} ${this.size.height}"></svg>
-            </slot>`;
+            <canvas></canvas>`;
     }
 }
 
-const Map = directive(Utils.MapDirective);
-Utils.registerComponent( 'component-base-2d', ComponentBase2D );
+if (!customElements.get('component-base-2d')) {
+    customElements.define('component-base-2d', ComponentBase2D);
+}
