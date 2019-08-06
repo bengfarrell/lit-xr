@@ -161,6 +161,7 @@ export default class BaseApplication extends EventListener {
                     if(this.controller.inputSource.gamepad.buttons[0].pressed){
                         if (!this.triggerDown){
                             this.onMouseEvent('mousedown', pick.pickedMesh, pick.pickedPoint);
+                            this.triggerDown = true;
                         }
                     } else {
                         if (this.triggerDown) {
