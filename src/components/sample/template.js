@@ -21,8 +21,8 @@ export default {
         return html`<style>
                .host {
                     display: inline-block;
-                    width: 100%;
-                    height: 100%;
+                    width: calc(100% - 50px);
+                    height: calc(100% - 50px);
                     padding: 25px;
                 }
                 

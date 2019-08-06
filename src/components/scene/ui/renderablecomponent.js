@@ -64,9 +64,9 @@ export default class RenderableComponent extends HTMLElement {
         const width = this.preferredSize.width;
         const height = this.preferredSize.height;
         if (this.hasAttribute('is-render-root')) {
-            return svg`<svg viewBox="0 0 ${width} ${height}">
-                        <foreignObject class="host" width="100%" height="100%" style="background: ${this.backgroundColor};">
-                            ${this.html()}
+            return svg`<svg width=${width} height="${height}" viewBox="0 0 ${width} ${height}">
+                        <foreignObject width="100%" height="100%">
+                            <div class="host" width="100%" height="100%" style="display: inline-block; background-color: ${this.backgroundColor};">${this.html()}</div>
                         </foreignObject>
                    </svg>`;
         } else {

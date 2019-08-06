@@ -12,16 +12,10 @@ export default class BaseApplication extends EventListener {
         this.engine = new Babylon.Engine(this.element, this.appConfig.engine.antialias, this.appConfig.engine.options);
         this.engine.enableOfflineSupport = false;
         this.initScene().then( (s) => {
-            this.scene = s;
-            this.engine.runRenderLoop(() => {
-            this.tick();
-        });
-
-        });
-
-        // Resize
-        window.addEventListener("resize", function () {
-            engine.resize();
+                this.scene = s;
+                this.engine.runRenderLoop(() => {
+                this.tick();
+            });
         });
     }
 
