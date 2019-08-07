@@ -48,16 +48,43 @@ export default class BaseApplication extends EventListener {
 
         // Check XR support
         const xrHelper = await scene.createDefaultXRExperienceAsync({floorMeshes: [environment.ground]});
-        xrHelper.baseExperience.onStateChangedObservable.add((state)=>{
-            if(state === Babylon.WebXRState.IN_XR){
-                // When entering webXR, position the user's feet at 0,0,-1
-                xrHelper.baseExperience.setPositionOfCameraUsingContainer(new Babylon.Vector3(0,xrHelper.baseExperience.camera.position.y,-1))
-            }
-        });
+        if(!await xrHelper.baseExperience.sessionManager.supportsSessionAsync("immersive-vr")){
+            const vrHelper = scene.createDefaultVRExperience();
+            vrHelper.enableInteractions();
+            vrHelper.onControllerMeshLoadedObservable.add((controller)=>{
+                this.controller = controller;
+                controller.onTriggerStateChangedObservable.add((stateObject)=>{
+                    const ray = this.controller.getForwardRay(1000);
+                    const pick = this.scene.pickWithRay(ray);
+                    if (pick.hit) {
+                        if (stateObject.value > 0.01) {
+                            if (!this.triggerDown) {
+                                this.onMouseEvent('mousedown', pick.pickedMesh, pick.pickedPoint);
+                                this.triggerDown = true;
+                            }
+                        } else {
+                            if (this.triggerDown) {
+                                this.onMouseEvent('mouseup', pick.pickedMesh, pick.pickedPoint);
+                            }
+                            this.triggerDown = false;
+                        }
+                    }
+                });
+            });
+            this.realityMode = 'vr';
+        } else {
+            this.realityMode = 'xr';
+            xrHelper.baseExperience.onStateChangedObservable.add((state)=>{
+                if(state === Babylon.WebXRState.IN_XR){
+                    // When entering webXR, position the user's feet at 0,0,-1
+                    xrHelper.baseExperience.setPositionOfCameraUsingContainer(new Babylon.Vector3(0,xrHelper.baseExperience.camera.position.y,-1))
+                }
+            });
 
-        xrHelper.input.onControllerAddedObservable.add((controller)=>{
-            this.controller = controller;
-        });
+            xrHelper.input.onControllerAddedObservable.add((controller)=>{
+                this.controller = controller;
+            });
+        }
 
         scene.onPointerObservable.add((pointerInfo) => {
             if (!this.controller) {
@@ -147,21 +174,28 @@ export default class BaseApplication extends EventListener {
             }
 
             if (this.controller) {
-                const ray = new Babylon.Ray(this.controller.pointer.absolutePosition, this.controller.pointer.forward, 1000);
+                let ray;
+                if (this.controller.getForwardRay) { // WebVR method
+                    ray = this.controller.getForwardRay(1000);
+                } else {
+                    ray = new Babylon.Ray(this.controller.pointer.absolutePosition, this.controller.pointer.forward, 1000);;
+                }
                 const pick = this.scene.pickWithRay(ray);
                 if (pick.hit) {
                     this.onMouseEvent('mousemove', pick.pickedMesh, pick.pickedPoint);
 
-                    if(this.controller.inputSource.gamepad.buttons[0].pressed){
-                        if (!this.triggerDown){
-                            this.onMouseEvent('mousedown', pick.pickedMesh, pick.pickedPoint);
-                            this.triggerDown = true;
+                    if (this.realityMode === 'xr') {
+                        if (this.controller.inputSource.gamepad.buttons[0].pressed) {
+                            if (!this.triggerDown) {
+                                this.onMouseEvent('mousedown', pick.pickedMesh, pick.pickedPoint);
+                                this.triggerDown = true;
+                            }
+                        } else {
+                            if (this.triggerDown) {
+                                this.onMouseEvent('mouseup', pick.pickedMesh, pick.pickedPoint);
+                            }
+                            this.triggerDown = false;
                         }
-                    } else {
-                        if (this.triggerDown) {
-                            this.onMouseEvent('mouseup', pick.pickedMesh, pick.pickedPoint);
-                        }
-                        this.triggerDown = false;
                     }
                 }
 
