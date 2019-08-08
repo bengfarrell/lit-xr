@@ -4,6 +4,7 @@ import Utils from '../scene/ui/componentutils.js';
 import Slider from '../scene/ui/components/slider.js';
 
 const Map = directive(Utils.MapDirective);
+const Image = directive(Utils.ImageDirective);
 
 export default {
     html(scope, data) {
@@ -14,6 +15,7 @@ export default {
                         Counter ${data.counter} ${data.message}
                     </div>
                     <xr-slider></xr-slider>
+                    <img width="75" height="75" src=${Image("./images/donut.jpg", scope )} />
                     <button @click=${e => scope.onClick(e)}>Click me</button>`;
     },
 

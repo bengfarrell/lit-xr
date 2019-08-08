@@ -39,7 +39,9 @@ export default class RenderableComponent extends HTMLElement {
     onInit() {}
 
     render() {
-        render(html`${this.svgwrapper()}`, this);
+        if (this.svgwrapper) {
+            render(html`${this.svgwrapper()}`, this);
+        }
 
         if (this.renderRoot.renderWrapper) {
             this.renderRoot.renderWrapper.render();

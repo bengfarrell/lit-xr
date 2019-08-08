@@ -1,9 +1,36 @@
+const images = {};
+
 export default {
     get MapDirective() {
         return (dict, key) =>
             (part) => {
                 part.setValue(key);
                 dict[key] = part.committer.element;
+            };
+    },
+
+    get ImageDirective() {
+        return (key, scope) =>
+            (part) => {
+                if (images[key]) {
+                    part.setValue(images[key]);
+                    return;
+                }
+
+                const request = new XMLHttpRequest();
+                request.open('GET', key, true);
+                request.responseType = 'blob';
+                request.onload = () => {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(request.response);
+                    reader.onload = e => {
+                        images[key] = e.target.result;
+                        part.committer.element.setAttribute('src', images[key]);
+                        scope.render();
+                    };
+                };
+                request.send();
+                part.setValue(key);
             };
     },
 
