@@ -1,13 +1,7 @@
-import {directive, render} from '../../../../../web_modules/lit-html.js';
-import ComponentBase2D from '../componentbase2d.js';
-import Utils from '../componentutils.js';
-import {svg, html, interactables} from "../pointerevents.js";
-import Template from "../../../sample/template.js";
-import RenderableComponent from "../renderablecomponent.js";
+import XRRenderBase from '../../src/xr-render-base.js';
+import {XRElement, svg, html, interactables, render} from '../../src/xr-element.js';
 
-const Map = directive(Utils.MapDirective);
-
-export default class Slider extends RenderableComponent {
+export default class Slider extends XRElement {
     static get preferredSize() { return { width: 500, height: 50 }; }
 
     onInit() {
@@ -82,4 +76,6 @@ export default class Slider extends RenderableComponent {
     }
 }
 
-Utils.registerComponent( 'xr-slider', Slider );
+if (!customElements.get('xr-slider')) {
+    customElements.define('xr-slider', Slider);
+}

@@ -1,10 +1,8 @@
-import {html} from '../scene/ui/pointerevents.js';
-import {directive} from "../../../web_modules/lit-html.js";
-import Utils from '../scene/ui/componentutils.js';
-import Slider from '../scene/ui/components/slider.js';
+import XRRenderBase from '../../../src/xr-render-base.js';
+import {XRElement, ImageDirective, html, interactables, render, directive} from '../../../src/xr-element.js';
+import Slider from '../slider.js';
 
-const Map = directive(Utils.MapDirective);
-const Image = directive(Utils.ImageDirective);
+const Image = directive(ImageDirective);
 
 export default {
     html(scope, data) {

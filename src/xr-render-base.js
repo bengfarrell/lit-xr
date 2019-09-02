@@ -1,9 +1,6 @@
-import {svg, html, render, directive} from "../../../../web_modules/lit-html.js";
-import {interactables} from './pointerevents.js';
-import SampleComponent from "../../sample/sample.js";
-import Utils from './componentutils.js';
+import {svg, html, render, directive, interactables} from './xr-element.js';
 
-export default class ComponentBase2D extends HTMLElement {
+export default class XRRenderBase extends HTMLElement {
     static get observedAttributes() { return ['root-component'] }
 
     static get HOVER_CLASS() { return 'hover'; }
@@ -65,7 +62,7 @@ export default class ComponentBase2D extends HTMLElement {
         this.dom.svg.sendMessage(name, o);
     }
 
-    handlePointerEvent(eventtype, x, y, debug) {
+    handlePointerEvent(eventtype, x, y) {
         let change = false;
         const bounds = this.getBoundingClientRect();
 
@@ -77,14 +74,21 @@ export default class ComponentBase2D extends HTMLElement {
         };
 
         const lastHovered = this._hovered.slice();
-        if (eventtype === 'mousemove') {
+        if (eventtype === 'pointermove') {
             this._hovered = [];
         }
 
         interactables.elementsForRoot(this).forEach( el => {
             const elBounds = el.getBoundingClientRect();
-            if (ComponentBase2D.isPointInsideBounds( {x: normalizedXY.absX, y: normalizedXY.absY}, elBounds) ) {
-                const e = new MouseEvent(eventtype, {
+            if (XRRenderBase.isPointInsideBounds( {x: normalizedXY.absX, y: normalizedXY.absY}, elBounds) ) {
+                let mouseeventtype;
+                switch (eventtype) {
+                    case 'pointerdown': mouseeventtype = 'mousedown'; break;
+                    case 'pointerup': mouseeventtype = 'mouseup'; break;
+                    case 'pointermove': mouseeventtype = 'mousemove'; break;
+                    case 'pointertap': mouseeventtype = 'click'; break;
+                }
+                const e = new MouseEvent(mouseeventtype, {
                     bubbles: true,
                     cancelable: true,
                     clientX: normalizedXY.x,
@@ -92,35 +96,19 @@ export default class ComponentBase2D extends HTMLElement {
                 });
                 el.dispatchEvent (e);
 
-                if (eventtype === 'mousedown') {
-                    this._lastMouseDown = { el: el, time: Date.now()};
-                } else if (eventtype === 'mouseup') {
-                    if (this._lastMouseDown && this._lastMouseDown.el === el) {
-                        const elapsedTime = Date.now() - this._lastMouseDown.time;
-                        if (elapsedTime < 500) {
-                            const e = new MouseEvent('click', {
-                                bubbles: true,
-                                cancelable: true,
-                                clientX: normalizedXY.x,
-                                clientY: normalizedXY.y
-                            });
-                            el.dispatchEvent(e);
-                        }
-                    }
-                    this._lastMouseDown = null;
-                } else if (eventtype === 'mousemove') {
+                if (eventtype === 'pointermove') {
                     this._hovered.push(el);
-                    el.classList.toggle( ComponentBase2D.HOVER_CLASS, true);
+                    el.classList.toggle( XRRenderBase.HOVER_CLASS, true);
                     change = true;
                 }
             }
         });
 
-        if (eventtype === 'mousemove') {
+        if (eventtype === 'pointermove') {
             // clean up all the elements that aren't hovered over
             for (let c = 0; c < lastHovered.length; c++) {
                 if (this._hovered.indexOf(lastHovered[c]) === -1) {
-                    lastHovered[c].classList.toggle(ComponentBase2D.HOVER_CLASS, false);
+                    lastHovered[c].classList.toggle(XRRenderBase.HOVER_CLASS, false);
                     change = true;
                 }
             }
@@ -173,6 +161,6 @@ export default class ComponentBase2D extends HTMLElement {
     }
 }
 
-if (!customElements.get('component-base-2d')) {
-    customElements.define('component-base-2d', ComponentBase2D);
+if (!customElements.get('xr-render-base')) {
+    customElements.define('xr-render-base', XRRenderBase);
 }

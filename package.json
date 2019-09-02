@@ -1,6 +1,6 @@
 {
   "name": "xrcomponents",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "dependencies": {
     "babylonjs": "^4.1.0-alpha.13",
     "lit-html": "^1.1.1"

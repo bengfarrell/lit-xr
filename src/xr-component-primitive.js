@@ -1,9 +1,9 @@
-import Babylon from '../../../../web_modules/babylonjs.js';
-import ComponentBase2D from './componentbase2d.js';
+import Babylon from '../web_modules/babylonjs.js';
+import XRRenderBase from './xr-render-base.js';
 
-export default class BabylonUIComponent {
+export default class XRComponentPrimitive {
     constructor(name, component, meshscale, scene, offscreenContainer) {
-        const renderingEl = document.createElement('component-base-2d');
+        const renderingEl = document.createElement('xr-render-base');
         offscreenContainer.appendChild(renderingEl);
         renderingEl.setAttribute('root-component', component);
         this.element = renderingEl;
@@ -23,8 +23,8 @@ export default class BabylonUIComponent {
         this.textureContext = this.texture.getContext();
         this.material = new Babylon.StandardMaterial("Mat", scene);
         this.material.diffuseTexture = this.texture;
-        this.material.specularColor = new BABYLON.Color3(0, 0, 0);
-        this.material.emissiveColor = new BABYLON.Color3(128, 128, 128);
+        this.material.specularColor = new Babylon.Color3(0, 0, 0);
+        this.material.emissiveColor = new Babylon.Color3(128, 128, 128);
         this.mesh.material = this.material;
 
         this.element.bufferCallback = data => this.onBufferCallback(data);
