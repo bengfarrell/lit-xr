@@ -1,6 +1,6 @@
 import BaseApplication from '../node_modules/babylon-scene/src/baseapplication.js';
-import XRComponentPrimitive from '../src/xr-component-primitive.js';
-import XRRenderBase from '../src/xr-render-base.js'
+import XrElementMesh from '../src/xr-element-mesh.js';
+import XrElementRenderRoot from '../src/xr-element-render-root.js'
 import Sample from './components/sample/sample.js';
 import Pointer from '../node_modules/babylon-scene/src/addons/pointer.js';
 
@@ -8,7 +8,7 @@ export default class extends BaseApplication {
     onReady() {
         const Babylon = this.stage.babylon;
         Pointer.add(this);
-        this.component = new XRComponentPrimitive('test', 'sample-component', .01, this.scene, document.getElementById('offscreen-container') );
+        this.component = new XrElementMesh('test', 'sample-component', .01, this.scene, document.getElementById('offscreen-container') );
     }
 
     onMeshPointer(pick, pointerInfo) {

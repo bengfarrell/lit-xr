@@ -1,4 +1,4 @@
-import XRRenderBase from '../../src/xr-render-base.js';
+import XrElementRenderRoot from '../../src/xr-element-render-root.js';
 import {XRElement, svg, html, interactables, render} from '../../src/xr-element.js';
 
 export default class Slider extends XRElement {

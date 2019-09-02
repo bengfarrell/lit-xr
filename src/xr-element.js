@@ -1,5 +1,5 @@
 import {render as LitRender, directive as LitDirective} from "../web_modules/lit-html.js";
-import XRRenderBase from "./xr-render-base.js";
+import XrElementRenderRoot from './xr-element-render-root.js';
 
 import {
     AttributeCommitter,
@@ -72,7 +72,7 @@ export class Interactables {
             let parent = el.parentElement;
 
             // can't depend on renderRoot existing due to timing issues when the component is first starting up
-            const rootEl = el.renderRoot !== undefined ? el.renderRoot : XRRenderBase.findRenderRoot(el);
+            const rootEl = el.renderRoot !== undefined ? el.renderRoot : XrElementRenderRoot.findRenderRoot(el);
             if (this._sorted.has(rootEl.renderWrapper)) {
                 this._sorted.get(rootEl.renderWrapper).push(el);
             } else {
@@ -130,7 +130,7 @@ export class XRElement extends HTMLElement {
 
     get renderRoot() {
         if (!this._cachedRoot) {
-            this._cachedRoot = XRRenderBase.findRenderRoot(this);
+            this._cachedRoot = XrElementRenderRoot.findRenderRoot(this);
         }
         return this._cachedRoot;
     }

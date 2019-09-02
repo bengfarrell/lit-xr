@@ -1,4 +1,4 @@
-import XRRenderBase from '../../../src/xr-render-base.js';
+import XrElementRenderRoot from '../../../src/xr-element-render-root.js';
 import {XRElement, ImageDirective, html, interactables, render, directive} from '../../../src/xr-element.js';
 import Slider from '../slider.js';
 

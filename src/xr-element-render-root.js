@@ -1,6 +1,6 @@
 import {svg, html, render, directive, interactables} from './xr-element.js';
 
-export default class XRRenderBase extends HTMLElement {
+export default class XrElementRenderRoot extends HTMLElement {
     static get observedAttributes() { return ['root-component'] }
 
     static get HOVER_CLASS() { return 'hover'; }
@@ -80,7 +80,7 @@ export default class XRRenderBase extends HTMLElement {
 
         interactables.elementsForRoot(this).forEach( el => {
             const elBounds = el.getBoundingClientRect();
-            if (XRRenderBase.isPointInsideBounds( {x: normalizedXY.absX, y: normalizedXY.absY}, elBounds) ) {
+            if (XrElementRenderRoot.isPointInsideBounds( {x: normalizedXY.absX, y: normalizedXY.absY}, elBounds) ) {
                 let mouseeventtype;
                 switch (eventtype) {
                     case 'pointerdown': mouseeventtype = 'mousedown'; break;
@@ -98,7 +98,7 @@ export default class XRRenderBase extends HTMLElement {
 
                 if (eventtype === 'pointermove') {
                     this._hovered.push(el);
-                    el.classList.toggle( XRRenderBase.HOVER_CLASS, true);
+                    el.classList.toggle( XrElementRenderRoot.HOVER_CLASS, true);
                     change = true;
                 }
             }
@@ -108,7 +108,7 @@ export default class XRRenderBase extends HTMLElement {
             // clean up all the elements that aren't hovered over
             for (let c = 0; c < lastHovered.length; c++) {
                 if (this._hovered.indexOf(lastHovered[c]) === -1) {
-                    lastHovered[c].classList.toggle(XRRenderBase.HOVER_CLASS, false);
+                    lastHovered[c].classList.toggle(XrElementRenderRoot.HOVER_CLASS, false);
                     change = true;
                 }
             }
@@ -162,5 +162,5 @@ export default class XRRenderBase extends HTMLElement {
 }
 
 if (!customElements.get('xr-render-base')) {
-    customElements.define('xr-render-base', XRRenderBase);
+    customElements.define('xr-render-base', XrElementRenderRoot);
 }

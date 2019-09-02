@@ -1,5 +1,5 @@
 import Template from './template.js';
-import XRRenderBase from '../../../src/xr-render-base.js';
+import XrElementRenderRoot from '../../../src/xr-element-render-root.js';
 import {XRElement} from '../../../src/xr-element.js';
 import Slider from "../slider.js";
 
