@@ -1,8 +1,7 @@
-import Babylon from '../web_modules/babylonjs.js';
 import XrElementRenderRoot from './xr-element-render-root.js';
 
 export default class XrElementMesh {
-    constructor(name, component, meshscale, scene, offscreenContainer) {
+    constructor(Babylon, name, component, meshscale, scene, offscreenContainer) {
         const renderingEl = document.createElement('xr-render-base');
         offscreenContainer.appendChild(renderingEl);
         renderingEl.setAttribute('root-component', component);

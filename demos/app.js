@@ -1,14 +1,14 @@
 import BaseApplication from '../node_modules/babylon-scene/src/baseapplication.js';
 import XrElementMesh from '../src/xr-element-mesh.js';
+import Babylon from '../web_modules/babylonjs.js';
 import XrElementRenderRoot from '../src/xr-element-render-root.js'
 import Sample from './components/sample/sample.js';
-import Pointer from '../node_modules/babylon-scene/src/addons/pointer.js';
 
 export default class extends BaseApplication {
+    static get Babylon() { return Babylon; }
+
     onReady() {
-        const Babylon = this.stage.babylon;
-        Pointer.add(this);
-        this.component = new XrElementMesh('test', 'sample-component', .01, this.scene, document.getElementById('offscreen-container') );
+        this.component = new XrElementMesh(Babylon, 'test', 'sample-component', .01, this.scene, document.getElementById('offscreen-container') );
     }
 
     onMeshPointer(pick, pointerInfo) {

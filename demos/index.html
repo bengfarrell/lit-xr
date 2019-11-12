@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <title>XR Components</title>
-    <script src="../node_modules/babylon-scene/babylonscene.nobabylon.js" type="module"></script>
+    <script src="../node_modules/babylon-scene/babylonscene.js" type="module"></script>
     <script src="pep.min.js"></script>
 
     <style>
@@ -27,8 +27,8 @@
 
 <body>
 <babylon-scene
-        app="../../demos/app.js"
-        babylon="../../web_modules/babylonjs.js">
+        addons="pointer"
+        app="app.js">
 </babylon-scene>
 
 <div id="offscreen-container"></div>
