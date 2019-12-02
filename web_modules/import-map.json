@@ -1,6 +1,0 @@
-{
-  "imports": {
-    "babylonjs": "./babylonjs.js",
-    "lit-html": "./lit-html.js"
-  }
-}

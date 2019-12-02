@@ -1,8 +1,13 @@
 {
   "name": "xrcomponents",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "dependencies": {
-    "babylonjs": "^4.1.0-alpha.13",
-    "lit-html": "^1.1.1"
+    "@babylonjs/core": "^4.0.3",
+    "babylon-scene": "^0.3.1",
+    "lit-element": "^2.2.1"
+  },
+  "scripts": {
+    "dev": "npx es-dev-server --watch --node-resolve --open demo/index.html",
+    "dev2": "npx ./node_modules/.bin/es-dev-server --watch --node-resolve --open demo/index.html"
   }
 }

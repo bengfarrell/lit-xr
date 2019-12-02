@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" class="spectrum--light spectrum--medium">
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <title>XR Components</title>
+    <script type="module" src="../node_modules/babylon-scene/babylonscene.js"></script>
+    <script src="../src/components/slider.js" type="module"></script>
+    <script src="../src/componentbase2d.js" type="module"></script>
+    <!--<script src="../pep.min.js"></script>-->
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #offscreen {
+            position: absolute;
+            left: -9999px;
+        }
+
+        babylon-scene {
+            width: 50%;
+            height: 50%;
+        }
+    </style>
+</head>
+
+<body>
+<babylon-scene app="app.js"></babylon-scene>
+<div id="offscreen"></div>
+
+</body>
+</html>
