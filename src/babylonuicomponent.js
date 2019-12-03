@@ -1,4 +1,4 @@
-import ComponentBase2D from './componentbase2d.js';
+import LitXr from './lit-xr.js';
 
 export default class BabylonUIComponent {
 

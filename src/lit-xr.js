@@ -3,7 +3,7 @@ import {interactables} from './pointerevents.js';
 import SampleComponent from "../demo/sample/sample.js";
 import Utils from './componentutils.js';
 
-export default class ComponentBase2D extends HTMLElement {
+export default class LitXr extends HTMLElement {
     static get observedAttributes() { return ['root-component'] }
 
     static get HOVER_CLASS() { return 'hover'; }
@@ -81,7 +81,7 @@ export default class ComponentBase2D extends HTMLElement {
 
         interactables.elementsForRoot(this).forEach( el => {
             const elBounds = el.getBoundingClientRect();
-            if (ComponentBase2D.isPointInsideBounds( {x: normalizedXY.absX, y: normalizedXY.absY}, elBounds) ) {
+            if (LitXr.isPointInsideBounds( {x: normalizedXY.absX, y: normalizedXY.absY}, elBounds) ) {
 
                 if (eventtype.mouse) {
                     const e = new MouseEvent(eventtype.mouse, {
@@ -122,7 +122,7 @@ export default class ComponentBase2D extends HTMLElement {
                 } else*/
                 if (eventtype.updateHoverStatus) {
                     this._hovered.push(el);
-                    el.classList.toggle( ComponentBase2D.HOVER_CLASS, true);
+                    el.classList.toggle( LitXr.HOVER_CLASS, true);
                     change = true;
                 }
             }
@@ -132,7 +132,7 @@ export default class ComponentBase2D extends HTMLElement {
             // clean up all the elements that aren't hovered over
             for (let c = 0; c < lastHovered.length; c++) {
                 if (this._hovered.indexOf(lastHovered[c]) === -1) {
-                    lastHovered[c].classList.toggle(ComponentBase2D.HOVER_CLASS, false);
+                    lastHovered[c].classList.toggle(LitXr.HOVER_CLASS, false);
                     change = true;
                 }
             }
@@ -186,5 +186,5 @@ export default class ComponentBase2D extends HTMLElement {
 }
 
 if (!customElements.get('component-base-2d')) {
-    customElements.define('component-base-2d', ComponentBase2D);
+    customElements.define('component-base-2d', LitXr);
 }

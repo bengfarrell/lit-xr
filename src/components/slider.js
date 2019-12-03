@@ -1,5 +1,5 @@
 import {directive, render} from 'lit-html';
-import ComponentBase2D from '../componentbase2d.js';
+import LitXr from '../lit-xr.js';
 import Utils from '../componentutils.js';
 import {svg, html, interactables} from "../pointerevents.js";
 import Template from "../../demo/sample/template.js";

@@ -1,6 +1,6 @@
 import {render} from "lit-html";
 import {svg, html} from "./pointerevents.js";
-import ComponentBase2D from "./componentbase2d.js";
+import LitXr from "./lit-xr.js";
 
 export default class RenderableComponent extends HTMLElement {
     static get preferredSize() {
@@ -17,7 +17,7 @@ export default class RenderableComponent extends HTMLElement {
 
     get renderRoot() {
         if (!this._cachedRoot) {
-            this._cachedRoot = ComponentBase2D.findRenderRoot(this);
+            this._cachedRoot = LitXr.findRenderRoot(this);
         }
         return this._cachedRoot;
     }

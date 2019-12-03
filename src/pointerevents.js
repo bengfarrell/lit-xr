@@ -6,7 +6,7 @@ import {
     PropertyCommitter, SVGTemplateResult, TemplateResult
 } from "lit-html";
 
-import ComponentBase2D from './componentbase2d.js';
+import LitXr from './lit-xr.js';
 
 /**
  * Creates Parts when a template is instantiated.
@@ -71,7 +71,7 @@ export class Interactables {
             let parent = el.parentElement;
 
             // can't depend on renderRoot existing due to timing issues when the component is first starting up
-            const rootEl = el.renderRoot !== undefined ? el.renderRoot : ComponentBase2D.findRenderRoot(el);
+            const rootEl = el.renderRoot !== undefined ? el.renderRoot : LitXr.findRenderRoot(el);
             if (this._sorted.has(rootEl.renderWrapper)) {
                 this._sorted.get(rootEl.renderWrapper).push(el);
             } else {
