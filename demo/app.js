@@ -1,5 +1,7 @@
 import {BaseApplication} from 'babylon-scene';
-import BabylonUIComponent from '../src/babylonuicomponent.js';
+import {BabylonUIComponent} from '../lit-xr.js';
+import SampleComponent from "../demo/sample-component.js";
+
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3, Color3 } from "@babylonjs/core/Maths/math";

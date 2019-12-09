@@ -1,7 +1,6 @@
-import LitXr from './lit-xr.js';
+import LitXRSurface from './lit-xr-surface.js';
 
 export default class BabylonUIComponent {
-
     createDefaultMesh(name) {
         return this._babylon.MeshBuilder.CreatePlane(name, {
             width: this.size.width  * this.size.scale,
@@ -17,7 +16,7 @@ export default class BabylonUIComponent {
             scale: opts.scale ? opts.scale : 0.1
         };
 
-        const renderingEl = document.createElement('component-base-2d');
+        const renderingEl = document.createElement('litxr-surface');
         this._container.appendChild(renderingEl);
         renderingEl.setAttribute('root-component', component);
         this.element = renderingEl;
@@ -34,7 +33,7 @@ export default class BabylonUIComponent {
         this.mesh.material = this.material;
 
         this.element.bufferCallback = data => this.onBufferCallback(data);
-        this.element.renderBuffer(this.size.width, this.size.height);
+        this.element.renderTexture(this.size.width, this.size.height);
 
         scene.onPointerObservable.add((pointerInfo) => {
             const pick = scene.pick(pointerInfo.event.clientX, pointerInfo.event.clientY);

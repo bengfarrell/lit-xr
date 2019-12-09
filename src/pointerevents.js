@@ -6,7 +6,7 @@ import {
     PropertyCommitter, SVGTemplateResult, TemplateResult
 } from "lit-html";
 
-import LitXr from './lit-xr.js';
+import LitXR from "./lit-xr.js";
 
 /**
  * Creates Parts when a template is instantiated.
@@ -29,6 +29,9 @@ class ModifiedTemplateProcessor {
         }
 
         if (prefix === '@') {
+            // LitXR change: Add element to interactables manager
+            // This assumes anything that LitElement intercepts prefixed with @ should be interactive
+            // Exceptions could be @change events or similar, but it should be fairly low cost to manage these extra
             interactables.add(element);
             return [new EventPart(element, name.slice(1), options.eventContext)];
         }
@@ -48,40 +51,61 @@ class ModifiedTemplateProcessor {
 }
 const modifiedTemplateProcessor = new ModifiedTemplateProcessor();
 
+/**
+ * class to manage a list of interactable elements (can take hover, click, etc)
+ * as elements cannot take pointer/mouse events in 3D context, as well as interacted with
+ * via WebXR controllers, they need to be tracked and managed to directly pass interaction events
+ */
 export class Interactables {
     constructor() {
         this._unsorted = [];
         this._sorted = new WeakMap();
     }
 
+    /**
+     * add element to interactables list
+     * @param {HTMLElement} el
+     */
     add(el) {
         this._unsorted.push(el);
+        this.sort();
     }
 
-    elementsForRoot(rootEl) {
-        if (this._sorted.has(rootEl)) {
-            return this._sorted.get(rootEl);
+    /**
+     * get elements associated with LitXRSurface
+     * @param {LitXRSurface} sfc
+     * @return {*[]|any}
+     */
+    elementsForSurface(sfc) {
+        if (this._sorted.has(sfc)) {
+            return this._sorted.get(sfc);
         }
         return [];
     }
 
+    /**
+     * take any unprocessed elements that were added and bucket them into
+     * weakmaps with their surface as the key
+     */
     sort() {
         for (let c = 0; c < this._unsorted.length; c++) {
             const el = this._unsorted[c];
-            let parent = el.parentElement;
 
-            // can't depend on renderRoot existing due to timing issues when the component is first starting up
-            const rootEl = el.renderRoot !== undefined ? el.renderRoot : LitXr.findRenderRoot(el);
-            if (this._sorted.has(rootEl.renderWrapper)) {
-                this._sorted.get(rootEl.renderWrapper).push(el);
+            // element may not even be a LitXR Web Component, it could be
+            // a normal div, button, etc - therefore recursion may be needed to find its surface
+            const surface = el.surface ? el.surface : LitXR.findSurface(el);
+
+            // can't depend on surface existing due to timing issues when the component is first starting up, so defer processing
+            if (!surface) { return; } // TODO: don't return, manage the unsorted list better
+
+            if (this._sorted.has(surface)) {
+                this._sorted.get(surface).push(el);
             } else {
-                this._sorted.set( rootEl.renderWrapper, [el]);
+                this._sorted.set( surface, [el]);
             }
         }
         this._unsorted = [];
     }
-
-
 }
 
 export const html = (strings, ...values) => new TemplateResult(strings, values, 'html', modifiedTemplateProcessor);

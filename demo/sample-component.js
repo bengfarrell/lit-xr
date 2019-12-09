@@ -1,25 +1,24 @@
-import {html} from '../../src/pointerevents.js';
-import {directive} from "lit-html";
-import Utils from '../../src/componentutils.js';
-import Slider from '../../src/components/slider.js';
+import {html, LitXR, Image} from "../lit-xr.js";
 
-const Map = directive(Utils.MapDirective);
-const Image = directive(Utils.ImageDirective);
+export default class SampleComponent extends LitXR {
+    static get properties() {
+        return {
+            counter: { type: Number },
+            message: { type: String },
+        };
+    }
 
-export default {
-    html(scope, data) {
-        const width = scope.preferredSize.width;
-        const height = scope.preferredSize.height;
-        return html`${this.css()}
-                    <div class="container">
-                        Counter ${data.counter} ${data.message}
-                    </div>
-                    <xr-slider></xr-slider>
-                    <img width="75" height="75" src=${Image("./images/donut.jpg", scope )} />
-                    <button @click=${e => scope.onClick(e)}>Click me</button>`;
-    },
+    constructor() {
+        super();
+        this.counter = 0;
+    }
 
-    css() {
+    onClick(e) {
+        this.counter ++;
+        this.requestUpdate();
+    }
+
+    render() {
         return html`<style>
                .host {
                     display: inline-block;
@@ -38,7 +37,7 @@ export default {
                     display: inline-block;
                 }
                 
-                .host xr-slider {
+                .host litxr-slider {
                     width: 300px;
                     height: 50px;
                     background-color: yellow;
@@ -52,6 +51,14 @@ export default {
                 button.hover, button:hover {
                     background-color: yellow;
                 }
-            </style>`;
+            </style>
+            <div class="container">
+                Counter ${this.counter} ${this.message}
+            </div>
+            <litxr-slider></litxr-slider>
+            <img width="75" height="75" src=${Image("./images/donut.jpg", this)} />
+            <button @click=${e => this.onClick(e)}>Click me</button>`;
     }
 }
+
+customElements.define('sample-component', SampleComponent);

@@ -1,16 +1,12 @@
-import {directive, render} from 'lit-html';
-import LitXr from '../lit-xr.js';
-import Utils from '../componentutils.js';
+import {directive} from 'lit-html';
+import LitXR from '../lit-xr.js';
 import {svg, html, interactables} from "../pointerevents.js";
-import Template from "../../demo/sample/template.js";
-import RenderableComponent from "../renderablecomponent.js";
 
-const Map = directive(Utils.MapDirective);
-
-export default class Slider extends RenderableComponent {
+export default class Slider extends LitXR {
     static get preferredSize() { return { width: 500, height: 50 }; }
 
-    onInit() {
+    constructor() {
+        super();
         this.data = {};
         this.dom = {};
         this.data.thumbX = 0;
@@ -42,44 +38,43 @@ export default class Slider extends RenderableComponent {
                 this.data.thumbX = e.clientX - this.data.thumbWidth/2 - this.offsetLeft;
                 break;
         }
-        this.render();
+        this.requestUpdate();
     }
 
-    css() {
-        return svg`<style>
-                xr-slider .track {
-                    width: calc(100% - 20px);
-                    height: calc(100% - 20px);
-                    margin: 10px;
-                    border-radius: 5px;
-                    background-color: black;
-                }
-                
-                xr-slider .thumb {
-                    border-color: black;
-                    border-style: solid;
-                    border-width: 1px;
-                    border-radius: 5px;
-                    height: calc(100% - 10px);
-                    background-color: white;
-                    position: absolute;
-                    top: 5px;
-                }
-                
-                xr-slider {
-                    display: inline-block;
-                    position: relative;
-                }
-            </style>`;
-    }
-
-    html() { return html`${this.css()}
-                        <div class="track"></div>
-                        <div class="thumb" @mousedown=${e => this.onPointerEvent(e)}
-                              @click=${e => this.onPointerEvent(e)}  
-                              style="left: ${this.data.thumbX}px; width: ${this.data.thumbWidth}px;">            
-                        </div>`;
+    render() {
+        return html`<style>
+                        litxr-slider .track {
+                            width: calc(100% - 20px);
+                            height: calc(100% - 20px);
+                            margin: 10px;
+                            border-radius: 5px;
+                            background-color: black;
+                        }
+                        
+                        litxr-slider .thumb {
+                            border-color: black;
+                            border-style: solid;
+                            border-width: 1px;
+                            border-radius: 5px;
+                            height: calc(100% - 10px);
+                            background-color: white;
+                            position: absolute;
+                            top: 5px;
+                        }
+                        
+                        litxr-slider {
+                            display: inline-block;
+                            position: relative;
+                        }
+                    </style>
+                    <div class="track"></div>
+                    <div class="thumb" @mousedown=${e => this.onPointerEvent(e)}
+                          @click=${e => this.onPointerEvent(e)}  
+                          style="left: ${this.data.thumbX}px; width: ${this.data.thumbWidth}px;">            
+                    </div>`;
     }
 }
 
-Utils.registerComponent( 'xr-slider', Slider );
+if (!customElements.get('litxr-slider')) {
+    customElements.define('litxr-slider', Slider);
+}
