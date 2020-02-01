@@ -6,7 +6,7 @@ This project is not associated with Polymer or Google, other than the fact that 
 
 This project is also unstable and more of a proof of concept until more components are built to properly test.
 
-LitXR is also based on a hack. Currently there is no way to snapshot a DOM element, so all components are serialized to SVG and set to an <img> source
+LitXR is also based on a hack. Currently there is no way to snapshot a DOM element, so all components are serialized to SVG and set to an &lt;img&gt; source
 
 Some gotchas when creating LitXR components:
 
@@ -19,4 +19,4 @@ or alternately, they are added automatically when assigning lit-html's @event fu
 - Override static getters "preferredSize" and "backgroundColor" to control 3D panel size and panel color
 
 TODO:
-- Figure out how to bundle finished app when using <babylon-scene> and dynamic imports for app and stage
+- Figure out how to bundle finished app when using &lt;babylon-scene&gt; and dynamic imports for app and stage
