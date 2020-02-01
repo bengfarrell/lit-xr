@@ -39,7 +39,7 @@ export default class BabylonUIComponent {
             const pick = scene.pick(pointerInfo.event.clientX, pointerInfo.event.clientY);
             if (pick.hit) {
                 if (pick.pickedMesh === this.mesh) {
-                    this.handlePointerEvent(pointerInfo.type, pick.pickedPoint);
+                    this.handlePointerEvent(pointerInfo.type, pick.pickedPoint, this.mesh);
                 }
             }
         });
@@ -49,7 +49,7 @@ export default class BabylonUIComponent {
         this.element.sendMessage(name, o);
     }
 
-    handlePointerEvent(eventtype, point, debug) {
+    handlePointerEvent(eventtype, point, mesh) {
         const PointerEventTypes = this._babylon.PointerEventTypes;
         let eventtypes;
         switch (eventtype) {
@@ -77,9 +77,9 @@ export default class BabylonUIComponent {
         // normalize XY to 0-1 range
         const width = this.size.width * this.size.scale;
         const height = this.size.height * this.size.scale;
-        const x = (point.x + width/2) / width;
-        const y = 1 - (point.y + height/2) / height;
-        this.element.handlePointerEvent(eventtypes, x, y, debug);
+        const x = (point.x - mesh.position.x + width/2) / width;
+        const y = 1 - (point.y - mesh.position.y + height/2) / height;
+        this.element.handlePointerEvent(eventtypes, x, y);
     }
 
     onBufferCallback(data) {

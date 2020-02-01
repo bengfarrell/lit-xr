@@ -1,63 +1,56 @@
 import {html, LitXR, Image} from "../lit-xr.js";
+import ColorPicker from "./colorpicker/colorpicker.js";
 
 export default class SampleComponent extends LitXR {
-    static get properties() {
-        return {
-            counter: { type: Number },
-            message: { type: String },
-        };
-    }
-
-    constructor() {
-        super();
-        this.counter = 0;
-    }
-
-    onClick(e) {
-        this.counter ++;
-        this.requestUpdate();
+    static get CHANGE_PRIMITIVE() { return 'onChangePrimitive'; }
+    static get preferredSize() {
+        return {width: 700, height: 300};
     }
 
     render() {
         return html`<style>
                .host {
-                    display: inline-block;
+                    display: flex;
                     width: calc(100% - 50px);
                     height: calc(100% - 50px);
                     padding: 25px;
                 }
                 
-                .container {
-                    color: black;
-                    font: 44px serif;
-                    overflow: auto;
-                    border-style: dashed;
-                    border-width: 3px;
-                    border-color: black;
-                    display: inline-block;
+                .primitives {
+                    display: flex;
+                    justify-content: center;
+                    flex: 1;
                 }
                 
-                .host litxr-slider {
-                    width: 300px;
+                .primitive-btn {
+                    background-color: #EAEAEA;
+                    padding: 15px;
+                    margin-right: 10px;
+                    margin-left: 10px;
+                    border-radius: 10px;
+                }
+                
+                .primitive-btn.hover,
+                .primitive-btn:hover{
+                    background-color: #AFAFAF;
+                }
+                
+                img {
+                    width: 50px;
                     height: 50px;
-                    background-color: yellow;
                 }
+             </style>
+             <div class="primitives">
+                <div @click=${ e => this.selectPrimitive('cube')} class="primitive-btn"><img src="${Image('./images/cube.png', this)}" /></div>
+                <div @click=${ e => this.selectPrimitive('cylinder')} class="primitive-btn"><img src="${Image('./images/cylinder.png', this)}" /></div>
+                <div @click=${ e => this.selectPrimitive('sphere')} class="primitive-btn"><img src="${Image('./images/sphere.png', this)}" /></div>
+             </div>
+             <litxr-color-picker></litxr-color-picker>`;
+    }
 
-                button {
-                    font: 44px serif;
-                    background-color: aqua;
-                }
-                
-                button.hover, button:hover {
-                    background-color: yellow;
-                }
-            </style>
-            <div class="container">
-                Counter ${this.counter} ${this.message}
-            </div>
-            <litxr-slider></litxr-slider>
-            <img width="75" height="75" src=${Image("./images/donut.jpg", this)} />
-            <button @click=${e => this.onClick(e)}>Click me</button>`;
+    selectPrimitive(type) {
+        const ce = new CustomEvent(SampleComponent.CHANGE_PRIMITIVE, { detail: type, bubbles: true, composed: true});
+        this.dispatchEvent(ce);
     }
 }
 

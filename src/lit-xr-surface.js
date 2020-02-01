@@ -48,7 +48,7 @@ export default class LitXRSurface extends HTMLElement {
 
     handlePointerEvent(eventtype, x, y, debug) {
         let change = false;
-        const bounds = this.getBoundingClientRect();
+        const bounds = this.getBoundingClientRect(true);
 
         const normalizedXY = {
             x: bounds.width * x,
@@ -60,8 +60,29 @@ export default class LitXRSurface extends HTMLElement {
         const lastHovered = this._hovered.slice();
         if (eventtype.updateHoverStatus) { this._hovered = []; }
 
+        // Route all events through document for situations where we're listening for document.addEventListener('click') or similar
+        if (eventtype.mouse) {
+            const e = new MouseEvent(eventtype.mouse, {
+                bubbles: true,
+                cancelable: true,
+                clientX: normalizedXY.x,
+                clientY: normalizedXY.y
+            });
+            document.dispatchEvent(e);
+        }
+
+        if (eventtype.pointer) {
+            const e = new PointerEvent(eventtype.pointer, {
+                bubbles: true,
+                cancelable: true,
+                clientX: normalizedXY.x,
+                clientY: normalizedXY.y
+            });
+            document.dispatchEvent(e);
+        }
+
         this.dom.mountedComponent.interactables.elementsForSurface(this).forEach( el => {
-            const elBounds = el.getBoundingClientRect();
+            const elBounds = el.getBoundingClientRect(true);
             if (LitXRSurface.isPointInsideBounds( {x: normalizedXY.absX, y: normalizedXY.absY}, elBounds) ) {
 
                 if (eventtype.mouse) {

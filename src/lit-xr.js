@@ -65,6 +65,22 @@ export default class LitXR extends LitElement {
         }
     }
 
+    getBoundingClientRect(noAdjust) {
+        const bounds = super.getBoundingClientRect();
+        if (this.surface && !noAdjust) {
+            const adjustedBounds = {};
+            const surfaceBounds = this.surface.getBoundingClientRect();
+            adjustedBounds.x = bounds.x - surfaceBounds.x;
+            adjustedBounds.y = bounds.y - surfaceBounds.y;
+            adjustedBounds.top = adjustedBounds.y;
+            adjustedBounds.bottom = adjustedBounds.top + bounds.height;
+            adjustedBounds.left = adjustedBounds.x;
+            adjustedBounds.right = adjustedBounds.left + bounds.width;
+            return adjustedBounds;
+        }
+        return bounds;
+    }
+
     /**
      * set LitXRSurface component that holds the UI component
      * @param {LitXRSurface} val

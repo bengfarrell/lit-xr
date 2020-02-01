@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" class="spectrum--light spectrum--medium">
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <title>XR Components</title>
+    <title>LitXR Demo</title>
     <script type="module" src="../node_modules/babylon-scene/babylonscene.js"></script>
 
     <style>
@@ -11,7 +11,7 @@
             padding: 0;
         }
 
-        #soffscreen {
+        .offscreen {
             position: absolute;
             left: -9999px;
         }
@@ -24,8 +24,7 @@
 </head>
 
 <body>
-<babylon-scene app="app.js"></babylon-scene>
-<div id="offscreen"></div>
-
+<babylon-scene usewebxr stage="stage.js" app="app.js"></babylon-scene>
+<div id="offscreen"s></div>
 </body>
 </html>

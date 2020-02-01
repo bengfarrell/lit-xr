@@ -1,4 +1,4 @@
-import {BaseApplication} from 'babylon-scene';
+import {BaseApplication, AddOns} from 'babylon-scene';
 import {BabylonUIComponent} from '../lit-xr.js';
 import SampleComponent from "../demo/sample-component.js";
 
@@ -28,16 +28,87 @@ export default class App extends BaseApplication {
         };
     }
 
+    onRender(deltaTime) {
+        if (!this.xrcontrollers) { return; }
+        for (let c = 0; c < this.xrcontrollers.length; c++) {
+            const ray = this.xrcontrollers[c].getForwardRay(99999);
+            const pick = this.stage.scene.pickWithRay(ray);
+            if (pick.pickedMesh === this.component.mesh) {
+                this.component.handlePointerEvent(PointerEventTypes.POINTERMOVE, pick.pickedPoint, this.component.mesh);
+            }
+        }
+    }
+
     onReady() {
+        AddOns.xrcontrollers.add(this);
         this.component = new BabylonUIComponent('sample-component',
             this.stage.scene, {
                 babylon: App.Babylon,
                 container: document.getElementById('offscreen')
             });
         this.component.mesh.position.z = 50;
+        this.component.mesh.position.x = 25;
+
+        this.changePrimitive('cube');
+
+        this.component.element.addEventListener('change', e => {
+            this.material = new StandardMaterial("color", this.stage.scene);
+            const color = new Color3(e.detail.rgb.r/255, e.detail.rgb.g/255, e.detail.rgb.b/255);
+            this.material.diffuseColor = color;
+            this.material.specularColor = color;
+            this.material.emissiveColor = color;
+            this.material.ambientColor = color;
+            this.material.alpha = e.detail.alpha /100;
+            this.primitive.material = this.material;
+        });
+
+        this.component.element.addEventListener(SampleComponent.CHANGE_PRIMITIVE, e => {
+            this.changePrimitive(e.detail);
+        });
     }
 
-    onRender(deltatime) {}
+    onControllerEvent(eventtype, button, controller, pick) {
+        if (pick.pickedMesh === this.component.mesh) {
+            const event = button.pressed ? PointerEventTypes.POINTERDOWN : PointerEventTypes.POINTERUP;
+            if (event === PointerEventTypes.POINTERDOWN) {
+                this.lastPointerDown = Date.now();
+            }
+            if (event === PointerEventTypes.POINTERUP && Date.now() - this.lastPointerDown < 250) {
+                this.component.handlePointerEvent(PointerEventTypes.POINTERTAP, pick.pickedPoint, this.component.mesh);
+            }
+            this.component.handlePointerEvent(event, pick.pickedPoint, this.component.mesh);
+        }
+    }
+
+    changePrimitive(type) {
+        if (this.primitive) { this.primitive.dispose(); }
+
+        switch (type) {
+            case 'sphere':
+                this.primitive = MeshBuilder.CreateSphere('sphere', {
+                    diameter: 5
+                }, this.stage.scene);
+                break;
+
+            case 'cylinder':
+                this.primitive = MeshBuilder.CreateCylinder('cylinder', {
+                    height: 5,
+                    diameter: 5
+                }, this.stage.scene);
+                break;
+
+            case 'cube':
+                this.primitive = MeshBuilder.CreateBox('box', {
+                    width: 5,
+                    height: 5,
+                    depth: 5
+                }, this.stage.scene);
+                break;
+        }
+        this.primitive.material = this.material;
+        this.primitive.position.x = -5;
+    }
+
     sendMessage(name, o) {
         this.component.sendMessage(name, o);
     }
